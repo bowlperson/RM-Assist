@@ -79,6 +79,7 @@ body {
   background: linear-gradient(180deg, var(--button-top), var(--button-bottom));
   box-shadow: 0 6px 0 var(--shadow);
   cursor: pointer;
+  color: var(--button-text, var(--text));
 }
 .btn:active { transform: translateY(2px); box-shadow: 0 4px 0 var(--shadow); }
 

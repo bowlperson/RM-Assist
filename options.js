@@ -1,4 +1,4 @@
-const BASE_THEME_ID = typeof DEFAULT_THEME_ID === "string" ? DEFAULT_THEME_ID : "emerald";
+const BASE_THEME_ID = typeof DEFAULT_THEME_ID === "string" ? DEFAULT_THEME_ID : "dark_midnight";
 const themeList = (typeof THEME_PRESETS !== "undefined" && Array.isArray(THEME_PRESETS))
   ? THEME_PRESETS
   : [{ id: BASE_THEME_ID, name: "Default", vars: {} }];

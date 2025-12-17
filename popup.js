@@ -1,4 +1,4 @@
-const BASE_THEME_ID = typeof DEFAULT_THEME_ID === "string" ? DEFAULT_THEME_ID : "emerald";
+const BASE_THEME_ID = typeof DEFAULT_THEME_ID === "string" ? DEFAULT_THEME_ID : "dark_midnight";
 
 const DEFAULTS = {
   masterEnabled: true,

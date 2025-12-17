@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Advanced Settings</title>
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <div class="title">ADVANCED MENU</div>
+      <div class="subtitle mono">Queue Notifier Settings</div>
+    </div>
+
+    <div class="card">
+      <div class="sectionTitle">Theme Options</div>
+      <div class="row">
+        <div class="label">Theme</div>
+        <select id="themeSelect"></select>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sectionTitle">Notification Settings</div>
+
+      <div class="row">
+        <div class="label">Mode</div>
+        <select id="notificationMode">
+          <option value="browser">Ping with browser (indicator + ping)</option>
+          <option value="windows">Windows notification (toast + ping)</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <div class="label">In-page indicator</div>
+        <label class="toggle">
+          <input type="checkbox" id="showInPageIndicator" />
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="row">
+        <div class="label">New Event Notification</div>
+        <label class="toggle">
+          <input type="checkbox" id="newEventEnabled" />
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="row">
+        <div class="label">Pending Notification (SLA)</div>
+        <label class="toggle">
+          <input type="checkbox" id="pendingEnabled" />
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="row">
+        <div class="label">SLA Time (mm:ss)</div>
+        <div class="inline">
+          <input class="input" id="slaMin" type="number" min="0" max="999" />
+          <span class="mono">:</span>
+          <input class="input" id="slaSec" type="number" min="0" max="59" />
+        </div>
+      </div>
+
+      <div class="row">
+        <button class="btn" id="testPing">Test Ping</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sectionTitle">Site Directory</div>
+
+      <div class="row">
+        <input class="inputWide" id="siteUrl" placeholder="https://example.com or http://10.3.5.105" />
+      </div>
+      <div class="row">
+        <input class="inputWide" id="siteNick" placeholder="Nickname (optional)" />
+      </div>
+      <div class="row">
+        <button class="btn" id="addSite">Add / Update Site</button>
+      </div>
+
+      <div class="divider"></div>
+
+      <div id="siteList"></div>
+    </div>
+
+    <div class="footer mono" id="saveStatus">Ready</div>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+:root {
+  --bg: #d7f7df;
+  --panel: #f6fff7;
+  --border: #0b2e1f;
+  --shadow: rgba(0,0,0,0.25);
+  --text: #062014;
+  --accent: #1f6f4a;
+  --accent2: #2aa36d;
+}
+
+body {
+  margin: 0;
+  padding: 10px;
+  width: 340px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: ui-monospace, Consolas, monospace;
+}
+
+.frame {
+  border: 4px solid var(--border);
+  border-radius: 14px;
+  background: linear-gradient(180deg, var(--panel), #eafff3);
+  box-shadow: 0 10px 0 var(--shadow);
+  padding: 10px;
+}
+
+.title {
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-align: center;
+  padding: 8px 10px;
+  border: 3px solid var(--border);
+  border-radius: 10px;
+  background: #c8ffe0;
+  box-shadow: 0 6px 0 var(--shadow);
+  margin-bottom: 10px;
+}
+
+.panel {
+  border: 3px solid var(--border);
+  border-radius: 12px;
+  background: #f9fffb;
+  padding: 10px;
+  box-shadow: 0 6px 0 var(--shadow);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 2px;
+}
+
+.label { font-weight: 800; }
+.value { font-weight: 700; max-width: 210px; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mono { font-variant-ligatures: none; }
+
+.divider {
+  height: 2px;
+  background: rgba(6,32,20,0.15);
+  margin: 8px 0;
+}
+
+.btn {
+  width: 100%;
+  border: 3px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  background: linear-gradient(180deg, #c8ffe0, #a6f3c9);
+  box-shadow: 0 6px 0 var(--shadow);
+  cursor: pointer;
+}
+.btn:active { transform: translateY(2px); box-shadow: 0 4px 0 var(--shadow); }
+
+.footer {
+  margin-top: 10px;
+  font-weight: 800;
+  text-align: center;
+  opacity: 0.9;
+}
+
+/* Toggle */
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 54px;
+  height: 28px;
+}
+.toggle input { display: none; }
+.slider {
+  position: absolute; inset: 0;
+  border: 3px solid var(--border);
+  border-radius: 999px;
+  background: #e6e6e6;
+  box-shadow: 0 4px 0 var(--shadow);
+  transition: 160ms ease;
+}
+.slider:before {
+  content: "";
+  position: absolute;
+  height: 18px; width: 18px;
+  left: 5px; top: 50%;
+  transform: translateY(-50%);
+  border: 3px solid var(--border);
+  border-radius: 999px;
+  background: #fff;
+  transition: 160ms ease;
+}
+.toggle input:checked + .slider {
+  background: linear-gradient(180deg, var(--accent2), var(--accent));
+}
+.toggle input:checked + .slider:before {
+  transform: translate(24px, -50%);
+  background: #d8ffd8;
+}

@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Queue Notifier</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="frame">
+    <div class="title">EVENT MENU</div>
+
+    <div class="panel">
+      <div class="row">
+        <div class="label">Current URL</div>
+        <div class="value mono" id="currentUrl">…</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="row">
+        <div class="label">Master</div>
+        <label class="toggle">
+          <input type="checkbox" id="masterEnabled" />
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="row">
+        <div class="label" id="siteToggleLabel">This Site</div>
+        <label class="toggle">
+          <input type="checkbox" id="siteEnabled" />
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="row">
+        <button class="btn" id="openAdvanced">Advanced Settings</button>
+      </div>
+    </div>
+
+    <div class="footer mono" id="statusText">Ready</div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

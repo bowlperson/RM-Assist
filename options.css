@@ -1,13 +1,18 @@
 /* Uses CSS variables so themes can swap easily */
 :root {
-  --bg: #d7f7df;
-  --panel: #f6fff7;
-  --border: #0b2e1f;
-  --shadow: rgba(0,0,0,0.25);
-  --text: #062014;
-  --accent: #1f6f4a;
-  --accent2: #2aa36d;
-  --card: #f9fffb;
+  --bg: #d9f4d1;
+  --panel: #eef9e6;
+  --panel-strong: #c7f3d3;
+  --card: #f6fff1;
+  --border: #0f3d2b;
+  --shadow: rgba(9, 40, 25, 0.25);
+  --text: #0f291a;
+  --muted-text: #1f422e;
+  --accent: #2b8a5a;
+  --accent2: #3bcf8f;
+  --button-top: #e8fbe6;
+  --button-bottom: #c5f2d1;
+  --divider: rgba(15, 41, 26, 0.16);
 }
 
 html, body { height: 100%; }
@@ -32,10 +37,10 @@ body {
   padding: 10px 12px;
   border: 4px solid var(--border);
   border-radius: 14px;
-  background: linear-gradient(180deg, #c8ffe0, #a6f3c9);
+  background: linear-gradient(180deg, var(--button-top), var(--button-bottom));
   box-shadow: 0 10px 0 var(--shadow);
 }
-.subtitle { text-align: center; margin-top: 10px; font-weight: 800; opacity: 0.9; }
+.subtitle { text-align: center; margin-top: 10px; font-weight: 800; color: var(--muted-text); }
 
 .card {
   border: 4px solid var(--border);
@@ -52,7 +57,7 @@ body {
   padding: 8px 10px;
   border: 3px solid var(--border);
   border-radius: 12px;
-  background: #eafff3;
+  background: var(--panel-strong);
 }
 
 .row {
@@ -69,7 +74,7 @@ body {
 
 .divider {
   height: 2px;
-  background: rgba(6,32,20,0.15);
+  background: var(--divider);
   margin: 10px 0;
 }
 
@@ -78,7 +83,7 @@ select, .input, .inputWide {
   border-radius: 10px;
   padding: 10px 10px;
   font-weight: 800;
-  background: #fff;
+  background: var(--panel);
   color: var(--text);
   box-shadow: 0 6px 0 var(--shadow);
   outline: none;
@@ -100,9 +105,10 @@ select, .input, .inputWide {
   padding: 12px 12px;
   font-weight: 900;
   letter-spacing: 0.5px;
-  background: linear-gradient(180deg, #c8ffe0, #a6f3c9);
+  background: linear-gradient(180deg, var(--button-top), var(--button-bottom));
   box-shadow: 0 8px 0 var(--shadow);
   cursor: pointer;
+  color: var(--button-text, var(--text));
 }
 .btn:active { transform: translateY(2px); box-shadow: 0 6px 0 var(--shadow); }
 
@@ -113,7 +119,7 @@ select, .input, .inputWide {
   position: absolute; inset: 0;
   border: 3px solid var(--border);
   border-radius: 999px;
-  background: #e6e6e6;
+  background: var(--panel-strong);
   box-shadow: 0 5px 0 var(--shadow);
   transition: 160ms ease;
 }
@@ -125,7 +131,7 @@ select, .input, .inputWide {
   transform: translateY(-50%);
   border: 3px solid var(--border);
   border-radius: 999px;
-  background: #fff;
+  background: var(--card);
   transition: 160ms ease;
 }
 .toggle input:checked + .slider {
@@ -133,7 +139,7 @@ select, .input, .inputWide {
 }
 .toggle input:checked + .slider:before {
   transform: translate(26px, -50%);
-  background: #d8ffd8;
+  background: var(--accent2);
 }
 
 .siteRow {
@@ -144,13 +150,13 @@ select, .input, .inputWide {
   padding: 10px;
   border: 3px solid var(--border);
   border-radius: 12px;
-  background: #fff;
+  background: var(--panel);
   box-shadow: 0 6px 0 var(--shadow);
   margin-bottom: 10px;
 }
 
 .siteMeta { overflow: hidden; }
 .siteTitle { font-weight: 900; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.siteSub { font-weight: 800; opacity: 0.8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.siteSub { font-weight: 800; color: var(--muted-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-.footer { text-align: center; font-weight: 900; opacity: 0.9; margin-top: 8px; }
+.footer { text-align: center; font-weight: 900; color: var(--muted-text); margin-top: 8px; }

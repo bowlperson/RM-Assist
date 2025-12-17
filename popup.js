@@ -1,10 +1,12 @@
+const BASE_THEME_ID = typeof DEFAULT_THEME_ID === "string" ? DEFAULT_THEME_ID : "emerald";
+
 const DEFAULTS = {
   masterEnabled: true,
   notificationMode: "windows",
   newEventEnabled: true,
   pendingEnabled: true,
   pendingSeconds: 120,
-  theme: "emerald",
+  theme: BASE_THEME_ID,
   showInPageIndicator: true,
   sites: []
 };
@@ -26,6 +28,8 @@ async function load() {
   statusText.textContent = "Loaded";
 
   const settings = await chrome.storage.sync.get(DEFAULTS);
+  const themeId = settings.theme || BASE_THEME_ID;
+  if (typeof applyTheme === "function") applyTheme(themeId, document);
 
   const masterEnabled = document.getElementById("masterEnabled");
   masterEnabled.checked = !!settings.masterEnabled;

@@ -145,6 +145,17 @@ function parseOrigin(url) {
   try { return new URL(url).origin; } catch { return null; }
 }
 
+function parseTimestamp(value) {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value < 1e12 ? Math.round(value * 1000) : Math.round(value);
+  }
+  if (typeof value === "string" && value.trim()) {
+    const parsed = Date.parse(value);
+    return Number.isNaN(parsed) ? null : parsed;
+  }
+  return null;
+}
+
 // Main ingestion from content script
 chrome.runtime.onMessage.addListener((msg, sender) => {
   if (msg?.type !== "EVENT_BATCH") return;
@@ -168,8 +179,8 @@ chrome.runtime.onMessage.addListener((msg, sender) => {
       const eventId = String(ev.id ?? ev.primary_key ?? "");
       if (!eventId) continue;
 
-      const updatedAt = Number(ev.updated_at ?? 0) || 0;
-      const reviewedAt = ev.reviewed_at ? Number(ev.reviewed_at) : null;
+      const updatedAt = parseTimestamp(ev.updated_at);
+      const reviewedAt = parseTimestamp(ev.reviewed_at);
 
       let st = originMap.get(eventId);
       const now = Date.now();
@@ -178,8 +189,8 @@ chrome.runtime.onMessage.addListener((msg, sender) => {
         // New event detected
         st = {
           firstSeenAt: now,
-          firstUpdatedAt: updatedAt || null,
-          lastUpdatedAt: updatedAt || null,
+          firstUpdatedAt: updatedAt,
+          lastUpdatedAt: updatedAt,
           slaStartAt: null,
           slaTimerId: null,
           reviewedAt: reviewedAt
@@ -206,13 +217,13 @@ chrome.runtime.onMessage.addListener((msg, sender) => {
       }
 
       // Update existing state
-      st.reviewedAt = reviewedAt || st.reviewedAt || null;
+      st.reviewedAt = reviewedAt ?? st.reviewedAt ?? null;
 
       // If reviewed, cancel SLA
       if (st.reviewedAt) {
         clearEventTimer(st);
         st.slaStartAt = st.slaStartAt || null;
-        st.lastUpdatedAt = updatedAt || st.lastUpdatedAt;
+        st.lastUpdatedAt = updatedAt ?? st.lastUpdatedAt;
         continue;
       }
 

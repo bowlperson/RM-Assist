@@ -25,6 +25,11 @@
     });
   });
 
+  chrome.storage.sync.get({ eventEndpointPatterns: [] }, (data) => {
+    const patterns = Array.isArray(data.eventEndpointPatterns) ? data.eventEndpointPatterns : [];
+    window.postMessage({ type: "EXT_ENDPOINT_PATTERNS", patterns }, "*");
+  });
+
   // In-page indicator handler (for "browser" notification mode)
   chrome.runtime.onMessage.addListener((msg) => {
     if (msg?.type === "INDICATOR" && msg.payload?.show) {
@@ -35,19 +40,41 @@
   function normalizeEvents(payload) {
     // Your preview looked like [[{...}, {...}]] sometimes.
     // Handle: array, nested array, or object with array fields.
-    let arr = payload;
-
-    if (Array.isArray(arr) && arr.length === 1 && Array.isArray(arr[0])) {
-      arr = arr[0];
-    }
+    const arr = extractEventArray(payload);
     if (!Array.isArray(arr)) return [];
 
-    // Only keep fields we care about
-    return arr.map(x => ({
-      id: x.id ?? x.primary_key,
-      updated_at: x.updated_at,
-      reviewed_at: x.reviewed_at
-    })).filter(x => x.id != null);
+    return arr
+      .map((x) => ({
+        id: x.id ?? x.primary_key,
+        updated_at: x.updated_at,
+        reviewed_at: x.reviewed_at
+      }))
+      .filter((x) => x.id != null);
+  }
+
+  function extractEventArray(payload) {
+    if (Array.isArray(payload)) {
+      if (payload.length === 1 && Array.isArray(payload[0])) return payload[0];
+      if (payload.every(isEventLike)) return payload;
+      const nested = payload.find(Array.isArray);
+      if (nested && nested.every(isEventLike)) return nested;
+      return payload;
+    }
+
+    if (payload && typeof payload === "object") {
+      const direct = payload.data || payload.results || payload.objects || payload.items;
+      if (Array.isArray(direct)) return direct;
+
+      for (const value of Object.values(payload)) {
+        if (Array.isArray(value) && value.some(isEventLike)) return value;
+      }
+    }
+
+    return null;
+  }
+
+  function isEventLike(value) {
+    return value && typeof value === "object" && ("id" in value || "primary_key" in value);
   }
 
   function showCenterToast(title, message, kind) {

@@ -8,6 +8,7 @@ const DEFAULTS = {
   pendingSeconds: 120, // default 2 min
   theme: "emerald",
   showInPageIndicator: true,
+  eventEndpointPatterns: [],
   // Site directory entries:
   // { origin: "http://10.3.5.105", nickname: "Mine Site", enabled: true }
   sites: []
@@ -16,7 +17,8 @@ const DEFAULTS = {
 // In-memory state (resets when service worker sleeps; we persist essential state in storage)
 const mem = {
   // origin -> { [eventId]: { firstSeenAt, firstUpdatedAt, lastUpdatedAt, slaStartAt, slaTimerId } }
-  originEvents: new Map()
+  originEvents: new Map(),
+  hydratedOrigins: new Set()
 };
 
 async function getSettings() {
@@ -89,7 +91,10 @@ function clearEventTimer(eventState) {
 function scheduleSla(origin, eventId, eventState, settings, siteNickname, tabId) {
   clearEventTimer(eventState);
 
-  const remainingMs = Math.max(0, settings.pendingSeconds * 1000);
+  const remainingMs = Math.max(
+    0,
+    (settings.pendingSeconds * 1000) - (Date.now() - (eventState.slaStartAt || Date.now()))
+  );
   eventState.slaTimerId = setTimeout(async () => {
     // Re-check current persisted state before firing (service worker may have slept; best effort)
     const latest = await chrome.storage.local.get(["persistedEvents"]);
@@ -145,6 +150,49 @@ function parseOrigin(url) {
   try { return new URL(url).origin; } catch { return null; }
 }
 
+function parseTimestamp(value) {
+  if (value == null) return null;
+  if (typeof value === "number") {
+    if (!Number.isFinite(value)) return null;
+    return value < 1e12 ? value * 1000 : value;
+  }
+  if (typeof value === "string") {
+    const parsed = Date.parse(value);
+    return Number.isNaN(parsed) ? null : parsed;
+  }
+  return null;
+}
+
+async function hydrateOriginState(origin, settings, siteNickname, tabId) {
+  if (mem.hydratedOrigins.has(origin)) return;
+  const current = await chrome.storage.local.get(["persistedEvents"]);
+  const persisted = current.persistedEvents || {};
+  const originEvents = persisted[origin] || {};
+  if (!Object.keys(originEvents).length) {
+    mem.hydratedOrigins.add(origin);
+    return;
+  }
+
+  const originMap = getOrInitOriginMap(origin);
+  for (const [eventId, saved] of Object.entries(originEvents)) {
+    originMap.set(eventId, {
+      firstSeenAt: saved.firstSeenAt || null,
+      firstUpdatedAt: saved.firstUpdatedAt || null,
+      lastUpdatedAt: saved.lastUpdatedAt || null,
+      slaStartAt: saved.slaStartAt || null,
+      slaTimerId: null,
+      reviewedAt: saved.reviewedAt || null
+    });
+  }
+
+  for (const [eventId, st] of originMap.entries()) {
+    if (st.reviewedAt || !st.slaStartAt || !settings.pendingEnabled) continue;
+    scheduleSla(origin, eventId, st, settings, siteNickname, tabId);
+  }
+
+  mem.hydratedOrigins.add(origin);
+}
+
 // Main ingestion from content script
 chrome.runtime.onMessage.addListener((msg, sender) => {
   if (msg?.type !== "EVENT_BATCH") return;
@@ -162,14 +210,15 @@ chrome.runtime.onMessage.addListener((msg, sender) => {
 
     const siteNickname = siteCfg.nickname || origin;
     const originMap = getOrInitOriginMap(origin);
+    await hydrateOriginState(origin, settings, siteNickname, tabId);
 
     // msg.events: [{ id, updated_at, reviewed_at }]
     for (const ev of msg.events || []) {
       const eventId = String(ev.id ?? ev.primary_key ?? "");
       if (!eventId) continue;
 
-      const updatedAt = Number(ev.updated_at ?? 0) || 0;
-      const reviewedAt = ev.reviewed_at ? Number(ev.reviewed_at) : null;
+      const updatedAt = parseTimestamp(ev.updated_at);
+      const reviewedAt = parseTimestamp(ev.reviewed_at);
 
       let st = originMap.get(eventId);
       const now = Date.now();
@@ -227,6 +276,8 @@ chrome.runtime.onMessage.addListener((msg, sender) => {
         st.lastUpdatedAt = updatedAt;
       } else if (updatedAt && !st.lastUpdatedAt) {
         st.lastUpdatedAt = updatedAt;
+      } else if (st.slaStartAt && !st.slaTimerId && settings.pendingEnabled) {
+        scheduleSla(origin, eventId, st, settings, siteNickname, tabId);
       }
     }
 

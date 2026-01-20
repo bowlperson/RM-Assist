@@ -1,53 +1,18 @@
+const BASE_THEME_ID = typeof DEFAULT_THEME_ID === "string" ? DEFAULT_THEME_ID : "dark_midnight";
+const themeList = (typeof THEME_PRESETS !== "undefined" && Array.isArray(THEME_PRESETS))
+  ? THEME_PRESETS
+  : [{ id: BASE_THEME_ID, name: "Default", vars: {} }];
+
 const DEFAULTS = {
   masterEnabled: true,
   notificationMode: "windows",
   newEventEnabled: true,
   pendingEnabled: true,
   pendingSeconds: 120,
-  theme: "emerald",
+  theme: BASE_THEME_ID,
   showInPageIndicator: true,
   sites: []
 };
-
-const THEMES = [
-  // Emerald-ish
-  { id: "emerald", name: "Emerald (Classic)", vars: {
-    "--bg": "#d7f7df", "--card": "#f9fffb", "--border": "#0b2e1f",
-    "--text": "#062014", "--accent": "#1f6f4a", "--accent2": "#2aa36d"
-  }},
-  { id: "ruby", name: "Ruby (Warm)", vars: {
-    "--bg": "#ffe0de", "--card": "#fff6f5", "--border": "#3a0b0b",
-    "--text": "#2a0707", "--accent": "#b32020", "--accent2": "#e24b4b"
-  }},
-  { id: "sapphire", name: "Sapphire (Cool)", vars: {
-    "--bg": "#ddefff", "--card": "#f6fbff", "--border": "#08243a",
-    "--text": "#061a2a", "--accent": "#1b5ea8", "--accent2": "#3d8ee6"
-  }},
-  { id: "leaf", name: "Leaf (Soft)", vars: {
-    "--bg": "#e8ffe6", "--card": "#fbfffb", "--border": "#13320b",
-    "--text": "#0f2209", "--accent": "#2a7f2a", "--accent2": "#4dc74d"
-  }},
-  // Dark themes (at least 3)
-  { id: "dark_emerald", name: "Dark Emerald", vars: {
-    "--bg": "#0b1210", "--card": "#101b17", "--border": "#2be18d",
-    "--text": "#d8fff0", "--accent": "#1f6f4a", "--accent2": "#2aa36d"
-  }},
-  { id: "dark_midnight", name: "Dark Midnight", vars: {
-    "--bg": "#0b0f18", "--card": "#111827", "--border": "#93c5fd",
-    "--text": "#e5f0ff", "--accent": "#3b82f6", "--accent2": "#60a5fa"
-  }},
-  { id: "dark_amber", name: "Dark Amber", vars: {
-    "--bg": "#0f0c07", "--card": "#1a140b", "--border": "#fbbf24",
-    "--text": "#fff2cc", "--accent": "#b45309", "--accent2": "#f59e0b"
-  }}
-];
-
-function applyTheme(themeId) {
-  const t = THEMES.find(x => x.id === themeId) || THEMES[0];
-  for (const [k, v] of Object.entries(t.vars)) {
-    document.documentElement.style.setProperty(k, v);
-  }
-}
 
 function originOf(input) {
   try {
@@ -77,12 +42,12 @@ async function load() {
 
   // Theme select
   const themeSelect = document.getElementById("themeSelect");
-  themeSelect.innerHTML = THEMES.map(t => `<option value="${t.id}">${t.name}</option>`).join("");
-  themeSelect.value = data.theme || "emerald";
-  applyTheme(themeSelect.value);
+  themeSelect.innerHTML = themeList.map(t => `<option value="${t.id}">${t.name}</option>`).join("");
+  themeSelect.value = data.theme || BASE_THEME_ID;
+  if (typeof applyTheme === "function") applyTheme(themeSelect.value, document);
 
   themeSelect.addEventListener("change", async () => {
-    applyTheme(themeSelect.value);
+    if (typeof applyTheme === "function") applyTheme(themeSelect.value, document);
     await save({ theme: themeSelect.value });
   });
 
